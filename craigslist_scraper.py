@@ -13,11 +13,19 @@ class CraigslistScraper(object):
         self.postal = postal
         self.max_price = max_price
         self.radius = radius
-
         self.url = f"https://{location}.craigslist.org/search/sss?search_distance={radius}&postal={postal}&max_price={max_price}"
+        self.driver = webdriver.Firefox()
+        self.delay = 3
 
-    def test(self):
-        print(self.url)
+    def load_craigslist_url(self):
+        self.driver.get(self.url)
+        try:
+            wait = WebDriverWait(self.driver, self.delay)
+            wait.until(EC.presence_of_element_located((By.ID, "searchform")))
+            print("Page is ready!")
+        except TimeoutException:
+            print("Loading took too much time")
+
 
 location = "greenville"
 postal = "29607"
@@ -25,5 +33,9 @@ max_price = "600"
 radius = "10"
 
 scraper = CraigslistScraper(location, postal, max_price, radius)
-scraper.test()
+scraper.load_craigslist_url()
+scraper.extract_post_titles()
+scraper.extract_post_urls()
+scraper.quit()
+
 
