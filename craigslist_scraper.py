@@ -26,13 +26,36 @@ class CraigslistScraper(object):
         except TimeoutException:
             print("Loading took too much time")
 
-    def extract_post_titles(self):
+    def extract_post_information(self):
         all_posts = self.driver.find_elements_by_class_name("result-row")
-        post_title_list = []
+        dates = []
+        titles = []
+        prices = []
         for post in all_posts:
-            print(post.text)
-            post_title_list.append(post.text)
-        return post_title_list
+            title = post.text.split("$")
+
+            if title[0] == '':
+                title = title[1]
+            else:
+                title = title[0]
+
+            title = title.split("\n")
+            price = title[0]
+            title = title[-1]
+            title = title.split(" ")
+            month = title[0]
+            day = title[1]
+            title = ' '.join(title[2:])
+            date = month + " " + day
+
+            print("PRICE: " + price)
+            print("TITLE: " + title)
+            print("DATE: " + date + "\n")
+            titles.append(title)
+            dates.append(date)
+            prices.append(price)
+        return titles, prices, dates
+
 
     def extract_post_urls(self):
         url_list = []
@@ -53,6 +76,7 @@ radius = "10"
 
 scraper = CraigslistScraper(location, postal, max_price, radius)
 scraper.load_craigslist_url()
-scraper.extract_post_titles()
-scraper.extract_post_urls()
-scraper.quit()
+titles, prices, dates = scraper.extract_post_information()
+print(titles)
+#scraper.extract_post_urls()
+#scraper.quit()
